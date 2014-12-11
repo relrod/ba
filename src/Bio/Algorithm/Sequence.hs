@@ -14,7 +14,7 @@ module Bio.Algorithm.Sequence where
 
 import Bio.Algorithm.Types
 import Control.Arrow
-import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.List
 import qualified Data.Map as Map
 
@@ -36,7 +36,7 @@ kmers k s = getMaxes . frequency . kmers'  k $ s
                    else kmers' k' (drop 1 s')
 
 reverseComplement :: RawSequence -> RawSequence
-reverseComplement (RawSequence s) = RawSequence . B.reverse . B.map complement $ s
+reverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complement $ s
   where
     complement 'A' = 'T'
     complement 'a' = 't'

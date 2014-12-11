@@ -23,11 +23,11 @@
 module Bio.Algorithm.Types where
 
 import Control.Lens
-import qualified Data.ByteString.Char8 as B
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
+import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.Text.Lazy as TL
+import qualified Data.Text.Lazy.Encoding as TL
 
-newtype RawSequence = RawSequence B.ByteString deriving (Eq, Ord, Show)
+newtype RawSequence = RawSequence BL.ByteString deriving (Eq, Ord, Show)
 
 class AsRawSequence p f s where
   _RawSequence :: Optic' p f s RawSequence
@@ -35,12 +35,12 @@ class AsRawSequence p f s where
 instance AsRawSequence p f RawSequence where
   _RawSequence = id
 
-instance (Profunctor p, Functor f) => AsRawSequence p f B.ByteString where
+instance (Profunctor p, Functor f) => AsRawSequence p f BL.ByteString where
   _RawSequence = iso RawSequence (\(RawSequence r) -> r)
 
 instance (Profunctor p, Functor f) => AsRawSequence p f String where
-  _RawSequence = iso (RawSequence . B.pack) (\(RawSequence r) -> B.unpack r)
+  _RawSequence = iso (RawSequence . BL.pack) (\(RawSequence r) -> BL.unpack r)
 
 -- | NOTE: This uses 'T.decodeUtf8' and 'T.encodeUtf8'.
-instance (Profunctor p, Functor f) => AsRawSequence p f T.Text where
-  _RawSequence = iso (RawSequence . T.encodeUtf8) (\(RawSequence r) -> T.decodeUtf8 r)
+instance (Profunctor p, Functor f) => AsRawSequence p f TL.Text where
+  _RawSequence = iso (RawSequence . TL.encodeUtf8) (\(RawSequence r) -> TL.decodeUtf8 r)
