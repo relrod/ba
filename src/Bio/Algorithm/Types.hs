@@ -1,6 +1,25 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
+-----------------------------------------------------------------------------
+-- |
+-- Module : Bio.Algorithm.Types
+-- Copyright : (C) 2014 Ricky Elrod
+-- License : BSD2 (see LICENSE file)
+-- Maintainer : Ricky Elrod <ricky@elrod.me>
+-- Stability : experimental
+-- Portability : lens
+--
+-- An experimental approach to working with various bioinformatics types in
+-- Haskell. Makes very heavy use of lens.
+--
+-- Making such strong use of lenses, we enable an API that lets you do things
+-- like this:
+--
+-- >>> T.pack "CCTTGGAA" ^. _RawSequence . to reverseComplement
+-- RawSequence "TTCCAAGG"
+-- it :: RawSequence
+----------------------------------------------------------------------------
 module Bio.Algorithm.Types where
 
 import Control.Lens

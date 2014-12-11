@@ -1,6 +1,20 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module : Bio.Algorithm.Sequence
+-- Copyright : (C) 2014 Ricky Elrod
+-- License : BSD2 (see LICENSE file)
+-- Maintainer : Ricky Elrod <ricky@elrod.me>
+-- Stability : experimental
+-- Portability : lens
+--
+-- Algorithms dealing with bioinformatics sequences. Right now it doesn't do
+-- much.
+----------------------------------------------------------------------------
 module Bio.Algorithm.Sequence where
 
+import Bio.Algorithm.Types
 import Control.Arrow
+import qualified Data.ByteString.Char8 as B
 import Data.List
 import qualified Data.Map as Map
 
@@ -21,8 +35,8 @@ kmers k s = getMaxes . frequency . kmers'  k $ s
                    then take k' s' : kmers' k' (drop 1 s')
                    else kmers' k' (drop 1 s')
 
-reverseComplement :: String -> String
-reverseComplement = reverse . map complement
+reverseComplement :: RawSequence -> RawSequence
+reverseComplement (RawSequence s) = RawSequence . B.reverse . B.map complement $ s
   where
     complement 'A' = 'T'
     complement 'a' = 't'
