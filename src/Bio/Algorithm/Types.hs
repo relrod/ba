@@ -41,6 +41,6 @@ instance (Profunctor p, Functor f) => AsRawSequence p f BL.ByteString where
 instance (Profunctor p, Functor f) => AsRawSequence p f String where
   _RawSequence = iso (RawSequence . BL.pack) (\(RawSequence r) -> BL.unpack r)
 
--- | NOTE: This uses 'T.decodeUtf8' and 'T.encodeUtf8'.
+-- | NOTE: This uses 'TL.decodeUtf8' and 'TL.encodeUtf8'.
 instance (Profunctor p, Functor f) => AsRawSequence p f TL.Text where
   _RawSequence = iso (RawSequence . TL.encodeUtf8) (\(RawSequence r) -> TL.decodeUtf8 r)
