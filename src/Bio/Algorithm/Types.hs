@@ -3,7 +3,6 @@
 
 module Bio.Algorithm.Types where
 
-import Control.Applicative
 import Control.Lens
 import qualified Data.ByteString.Char8 as B
 import qualified Data.Text as T
@@ -17,12 +16,12 @@ class AsRawSequence p f s where
 instance AsRawSequence p f RawSequence where
   _RawSequence = id
 
-instance (Choice p, Applicative f) => AsRawSequence p f B.ByteString where
+instance (Profunctor p, Functor f) => AsRawSequence p f B.ByteString where
   _RawSequence = iso RawSequence (\(RawSequence r) -> r)
 
-instance (Choice p, Applicative f) => AsRawSequence p f String where
+instance (Profunctor p, Functor f) => AsRawSequence p f String where
   _RawSequence = iso (RawSequence . B.pack) (\(RawSequence r) -> B.unpack r)
 
 -- | NOTE: This uses 'T.decodeUtf8' and 'T.encodeUtf8'.
-instance (Choice p, Applicative f) => AsRawSequence p f T.Text where
+instance (Profunctor p, Functor f) => AsRawSequence p f T.Text where
   _RawSequence = iso (RawSequence . T.encodeUtf8) (\(RawSequence r) -> T.decodeUtf8 r)
