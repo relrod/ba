@@ -1,4 +1,4 @@
-# ba
+# ba [![Build Status](https://travis-ci.org/relrod/ba.svg?branch=master)](https://travis-ci.org/relrod/ba)
 
 **NOTE: Don't use this yet!**
 
