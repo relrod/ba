@@ -19,6 +19,10 @@
 -- >>> T.pack "CCTTGGAA" ^. _RawSequence . to reverseComplement
 -- RawSequence "TTCCAAGG"
 -- it :: RawSequence
+--
+-- Note that you can convert between lazy and strict versions of ByteString and
+-- Text by using the appropriate
+-- <https://hackage.haskell.org/package/lens/docs/Control-Lens-Iso.html#t:Strict lens combinators>.
 ----------------------------------------------------------------------------
 module Bio.Algorithm.Types where
 
