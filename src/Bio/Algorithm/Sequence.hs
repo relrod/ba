@@ -24,7 +24,7 @@ kmers k s = getMaxes . frequency . kmers'  k $ s
     frequency :: Ord a => [a] -> Map.Map a Int
     frequency = Map.fromList . fmap (head &&& length) . group . sort
 
-    getMaxes :: Ord a => Map.Map k a -> [k]
+    getMaxes :: (Ord a, Ord k) => Map.Map k a -> [k]
     getMaxes m = Map.keys (Map.filter (==f) m)
       where
         f = maximum . Map.elems $ m
