@@ -16,9 +16,8 @@
 -- Making such strong use of lenses, we enable an API that lets you do things
 -- like this:
 --
--- >>> T.pack "CCTTGGAA" ^. _RawSequence . to reverseComplement
+-- >>> T.pack "CCTTGGAA" ^. lazy . _RawSequence . to dnaReverseComplement
 -- RawSequence "TTCCAAGG"
--- it :: RawSequence
 --
 -- Note that you can convert between lazy and strict versions of ByteString and
 -- Text by using the appropriate
@@ -30,6 +29,10 @@ import Control.Lens
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Lazy.Encoding as TL
+
+-- $setup
+-- >>> import qualified Data.Text as T
+-- >>> import Bio.Algorithm.Sequence
 
 newtype RawSequence = RawSequence BL.ByteString deriving (Eq, Ord, Show)
 

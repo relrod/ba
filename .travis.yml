@@ -46,4 +46,4 @@ install:
 
 script:
   - $CABAL build
-  #- cabal test --show-details=always --test-option="--color=always"
+  - cabal test --show-details=always --test-option="--color=always"
