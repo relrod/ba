@@ -34,13 +34,17 @@ class AsRawSequence p f s where
 
 instance AsRawSequence p f RawSequence where
   _RawSequence = id
+  {-# INLINE _RawSequence #-}
 
 instance (Profunctor p, Functor f) => AsRawSequence p f BL.ByteString where
   _RawSequence = iso RawSequence (\(RawSequence r) -> r)
+  {-# INLINE _RawSequence #-}
 
 instance (Profunctor p, Functor f) => AsRawSequence p f String where
   _RawSequence = iso (RawSequence . BL.pack) (\(RawSequence r) -> BL.unpack r)
+  {-# INLINE _RawSequence #-}
 
 -- | NOTE: This uses 'TL.decodeUtf8' and 'TL.encodeUtf8'.
 instance (Profunctor p, Functor f) => AsRawSequence p f TL.Text where
   _RawSequence = iso (RawSequence . TL.encodeUtf8) (\(RawSequence r) -> TL.decodeUtf8 r)
+  {-# INLINE _RawSequence #-}
