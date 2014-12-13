@@ -105,11 +105,13 @@ rnaReverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complem
 -- | Transcribes a DNA sequence into RNA.
 --
 -- Transcribe a DNA sequence:
+--
 -- >>> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to dnaToRna
 -- RawSequence "GAUGGAACUUGACUACGUAAAUU"
 --
 -- Transcribe and then take the 'rnaReverseComplement':
--- λ> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to (rnaReverseComplement . dnaToRna)
+--
+-- >>> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to (rnaReverseComplement . dnaToRna)
 -- RawSequence "AAUUUACGUAGUCAAGUUCCAUC"
 dnaToRna :: RawSequence -> RawSequence
 dnaToRna (RawSequence s) = RawSequence . BL.map rna $ s
