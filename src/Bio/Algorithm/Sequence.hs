@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module : Bio.Algorithm.Sequence
@@ -15,11 +16,15 @@ module Bio.Algorithm.Sequence (
   dnaReverseComplement
 , rnaReverseComplement
 
-  -- * k-mer algorithms
+   -- * Transcription
+, dnaToRna
+
+   -- * k-mer algorithms
 , kmers
 ) where
 
 import Bio.Algorithm.Types
+import Control.Applicative
 import Control.Arrow
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.List
@@ -33,16 +38,15 @@ import qualified Data.Map as Map
 
 -- | Find and list all of the kmers of the given length in the given string.
 --
--- >>> kmers 3 "AGATCGAGTG"
--- ["AGA","AGT","ATC","CGA","GAG","GAT","GTG","TCG"]
+-- >>> kmers 3 (RawSequence $ BL.pack "AGATCGAGTG")
+-- [RawSequence "AGA",RawSequence "AGT",RawSequence "ATC",RawSequence "CGA",RawSequence "GAG",RawSequence "GAT",RawSequence "GTG",RawSequence "TCG"]
 --
--- >>> kmers 5 "GTAGAGCTGT"
--- ["AGAGC","AGCTG","GAGCT","GCTGT","GTAGA","TAGAG"]
-kmers :: Ord a =>
-         Int   -- ^ The length of the k-mers (i.e., the /k/ of the "k-mer")
-      -> [a]   -- ^ The string (or list) to search in
-      -> [[a]] -- ^ The resulting list of k-mers
-kmers k s = getMaxes . frequency . kmers'  k $ s
+-- >>> kmers 5 (RawSequence $ BL.pack "GTAGAGCTGT")
+-- [RawSequence "AGAGC",RawSequence "AGCTG",RawSequence "GAGCT",RawSequence "GCTGT",RawSequence "GTAGA",RawSequence "TAGAG"]
+kmers :: Int           -- ^ The length of the k-mers (i.e., the /k/ of the "k-mer")
+      -> RawSequence   -- ^ The sequence to search in
+      -> [RawSequence] -- ^ The resulting list of k-mers
+kmers k (RawSequence s) = RawSequence <$> (getMaxes . frequency . kmers' k $ s)
   where
     frequency :: Ord a => [a] -> Map.Map a Int
     frequency = Map.fromList . fmap (head &&& length) . group . sort
@@ -52,11 +56,11 @@ kmers k s = getMaxes . frequency . kmers'  k $ s
       where
         f = maximum . Map.elems $ m
 
-    kmers' :: Int -> [a] -> [[a]]
-    kmers' _ [] = []
-    kmers' k' s' = if length s' >= k'
-                   then take k' s' : kmers' k' (drop 1 s')
-                   else kmers' k' (drop 1 s')
+    kmers' :: Int -> BL.ByteString -> [BL.ByteString]
+    kmers' _ "" = []
+    kmers' k' s' = if BL.length s' >= fromIntegral k'
+                   then BL.take (fromIntegral k') s' : kmers' k' (BL.drop 1 s')
+                   else kmers' k' (BL.drop 1 s')
 
 -- | Return the reverse complement for some DNA sequence.
 --
@@ -80,11 +84,11 @@ dnaReverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complem
 
 -- | Return the reverse complement for some RNA sequence.
 --
--- >>> rnaReverseComplement (RawSequence (BL.pack "CCTTGGAA"))
--- RawSequence "UUCCAAGG"
+-- >>> rnaReverseComplement (RawSequence (BL.pack "GAUGGAACUUGACUACGUAAAUU"))
+-- RawSequence "AAUUUACGUAGUCAAGUUCCAUC"
 --
--- >>> T.pack "CCTTGGAA" ^. lazy . _RawSequence . to rnaReverseComplement
--- RawSequence "UUCCAAGG"
+-- >>> T.pack "GAUGGAACUUGACUACGUAAAUU" ^. lazy . _RawSequence . to rnaReverseComplement
+-- RawSequence "AAUUUACGUAGUCAAGUUCCAUC"
 rnaReverseComplement :: RawSequence -> RawSequence
 rnaReverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complement $ s
   where
@@ -97,3 +101,19 @@ rnaReverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complem
     complement 'G' = 'C'
     complement 'g' = 'c'
     complement x   = x
+
+-- | Transcribes a DNA sequence into RNA.
+--
+-- Transcribe a DNA sequence:
+-- >>> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to dnaToRna
+-- RawSequence "GAUGGAACUUGACUACGUAAAUU"
+--
+-- Transcribe and then take the 'rnaReverseComplement':
+-- λ> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to (rnaReverseComplement . dnaToRna)
+-- RawSequence "AAUUUACGUAGUCAAGUUCCAUC"
+dnaToRna :: RawSequence -> RawSequence
+dnaToRna (RawSequence s) = RawSequence . BL.map rna $ s
+  where
+    rna 'T' = 'U'
+    rna 't' = 'u'
+    rna x   = x
