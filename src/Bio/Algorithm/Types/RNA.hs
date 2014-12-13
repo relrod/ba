@@ -10,7 +10,7 @@
 -- Stability : experimental
 -- Portability : lens
 --
--- DNA sequences
+-- RNA sequences
 ----------------------------------------------------------------------------
 module Bio.Algorithm.Types.RNA where
 
