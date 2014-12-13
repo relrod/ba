@@ -13,8 +13,8 @@
 -- Making such strong use of lenses, we enable an API that lets you do things
 -- like this:
 --
--- >>> T.pack "CCTTGGAA" ^. lazy . _RawSequence . to dnaReverseComplement
--- RawSequence "TTCCAAGG"
+-- >>> T.pack "CCTTGGAA" ^. lazy . _RawSequence . to (dnaReverseComplement . DNA)
+-- DNA (RawSequence "TTCCAAGG")
 --
 -- Note that you can convert between lazy and strict versions of ByteString and
 -- Text by using the appropriate
@@ -24,7 +24,9 @@
 ----------------------------------------------------------------------------
 module Bio.Algorithm.Types (module T) where
 
+import Bio.Algorithm.Types.DNA as T
 import Bio.Algorithm.Types.RawSequence as T
+import Bio.Algorithm.Types.RNA as T
 
 -- $setup
 -- >>> import Bio.Algorithm.Sequence

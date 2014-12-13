@@ -64,13 +64,13 @@ kmers k (RawSequence s) = RawSequence <$> (getMaxes . frequency . kmers' k $ s)
 
 -- | Return the reverse complement for some DNA sequence.
 --
--- >>> dnaReverseComplement (RawSequence (BL.pack "CCTTGGAA"))
--- RawSequence "TTCCAAGG"
+-- >>> dnaReverseComplement (DNA (RawSequence (BL.pack "CCTTGGAA")))
+-- DNA (RawSequence "TTCCAAGG")
 --
--- >>> T.pack "CCTTGGAA" ^. lazy . _RawSequence . to dnaReverseComplement
--- RawSequence "TTCCAAGG"
-dnaReverseComplement :: RawSequence -> RawSequence
-dnaReverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complement $ s
+-- >>> T.pack "CCTTGGAA" ^. lazy . _RawSequence . to (dnaReverseComplement . DNA)
+-- DNA (RawSequence "TTCCAAGG")
+dnaReverseComplement :: DNA -> DNA
+dnaReverseComplement (DNA (RawSequence s)) = DNA . RawSequence . BL.reverse . BL.map complement $ s
   where
     complement 'A' = 'T'
     complement 'a' = 't'
@@ -84,13 +84,13 @@ dnaReverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complem
 
 -- | Return the reverse complement for some RNA sequence.
 --
--- >>> rnaReverseComplement (RawSequence (BL.pack "GAUGGAACUUGACUACGUAAAUU"))
--- RawSequence "AAUUUACGUAGUCAAGUUCCAUC"
+-- >>> rnaReverseComplement (RNA (RawSequence (BL.pack "GAUGGAACUUGACUACGUAAAUU")))
+-- RNA (RawSequence "AAUUUACGUAGUCAAGUUCCAUC")
 --
--- >>> T.pack "GAUGGAACUUGACUACGUAAAUU" ^. lazy . _RawSequence . to rnaReverseComplement
--- RawSequence "AAUUUACGUAGUCAAGUUCCAUC"
-rnaReverseComplement :: RawSequence -> RawSequence
-rnaReverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complement $ s
+-- >>> T.pack "GAUGGAACUUGACUACGUAAAUU" ^. lazy . _RawSequence . to (rnaReverseComplement . RNA)
+-- RNA (RawSequence "AAUUUACGUAGUCAAGUUCCAUC")
+rnaReverseComplement :: RNA -> RNA
+rnaReverseComplement (RNA (RawSequence s)) = RNA . RawSequence . BL.reverse . BL.map complement $ s
   where
     complement 'A' = 'U'
     complement 'a' = 'u'
@@ -106,15 +106,15 @@ rnaReverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complem
 --
 -- Transcribe a DNA sequence:
 --
--- >>> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to dnaToRna
--- RawSequence "GAUGGAACUUGACUACGUAAAUU"
+-- >>> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to (dnaToRna . DNA)
+-- RNA (RawSequence "GAUGGAACUUGACUACGUAAAUU")
 --
 -- Transcribe and then take the 'rnaReverseComplement':
 --
--- >>> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to (rnaReverseComplement . dnaToRna)
--- RawSequence "AAUUUACGUAGUCAAGUUCCAUC"
-dnaToRna :: RawSequence -> RawSequence
-dnaToRna (RawSequence s) = RawSequence . BL.map rna $ s
+-- >>> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to (rnaReverseComplement . dnaToRna . DNA)
+-- RNA (RawSequence "AAUUUACGUAGUCAAGUUCCAUC")
+dnaToRna :: DNA -> RNA
+dnaToRna (DNA (RawSequence s)) = RNA . RawSequence . BL.map rna $ s
   where
     rna 'T' = 'U'
     rna 't' = 'u'
