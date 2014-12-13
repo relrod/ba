@@ -70,3 +70,23 @@ dnaReverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complem
     complement 'G' = 'C'
     complement 'g' = 'c'
     complement x   = x
+
+-- | Return the reverse complement for some RNA sequence.
+--
+-- >>> rnaReverseComplement (RawSequence (BL.pack "CCTTGGAA"))
+-- RawSequence "UUCCAAGG"
+--
+-- >>> T.pack "CCTTGGAA" ^. lazy . _RawSequence . to rnaReverseComplement
+-- RawSequence "UUCCAAGG"
+rnaReverseComplement :: RawSequence -> RawSequence
+rnaReverseComplement (RawSequence s) = RawSequence . BL.reverse . BL.map complement $ s
+  where
+    complement 'A' = 'U'
+    complement 'a' = 'u'
+    complement 'U' = 'A'
+    complement 'u' = 'a'
+    complement 'C' = 'G'
+    complement 'c' = 'g'
+    complement 'G' = 'C'
+    complement 'g' = 'c'
+    complement x   = x
