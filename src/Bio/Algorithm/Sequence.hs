@@ -10,7 +10,14 @@
 -- Algorithms dealing with bioinformatics sequences. Right now it doesn't do
 -- much.
 ----------------------------------------------------------------------------
-module Bio.Algorithm.Sequence where
+module Bio.Algorithm.Sequence (
+   -- * Complements and Reverse Complements
+  dnaReverseComplement
+, rnaReverseComplement
+
+  -- * k-mer algorithms
+, kmers
+) where
 
 import Bio.Algorithm.Types
 import Control.Arrow
