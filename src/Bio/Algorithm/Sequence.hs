@@ -12,14 +12,14 @@
 -- much.
 ----------------------------------------------------------------------------
 module Bio.Algorithm.Sequence (
-   -- * Complements and Reverse Complements
+  -- * Complements and Reverse Complements
   dnaReverseComplement
 , rnaReverseComplement
 
-   -- * Transcription
+  -- * Transcription
 , dnaToRna
 
-   -- * k-mer algorithms
+  -- * k-mer algorithms
 , kmers
 ) where
 

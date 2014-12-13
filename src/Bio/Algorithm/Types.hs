@@ -22,11 +22,15 @@
 --
 -- This module simply re-exports all of Bio.Algorithm.Types.*.
 ----------------------------------------------------------------------------
-module Bio.Algorithm.Types (module T) where
+module Bio.Algorithm.Types (
+  module Bio.Algorithm.Types.DNA
+, module Bio.Algorithm.Types.RawSequence
+, module Bio.Algorithm.Types.RNA
+) where
 
-import Bio.Algorithm.Types.DNA as T
-import Bio.Algorithm.Types.RawSequence as T
-import Bio.Algorithm.Types.RNA as T
+import Bio.Algorithm.Types.DNA
+import Bio.Algorithm.Types.RawSequence
+import Bio.Algorithm.Types.RNA
 
 -- $setup
 -- >>> import Bio.Algorithm.Sequence
