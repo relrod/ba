@@ -19,11 +19,10 @@ import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Lazy.Encoding as TL
 
--- $setup
--- >>> import qualified Data.Text as T
--- >>> import Bio.Algorithm.Sequence
-
 newtype RawSequence = RawSequence BL.ByteString deriving (Eq, Ord, Show)
+
+instance Reversing RawSequence where
+  reversing (RawSequence s) = RawSequence . reversing $ s
 
 class AsRawSequence p f s where
   _RawSequence :: Optic' p f s RawSequence

@@ -25,3 +25,8 @@
 module Bio.Algorithm.Types (module T) where
 
 import Bio.Algorithm.Types.RawSequence as T
+
+-- $setup
+-- >>> import Bio.Algorithm.Sequence
+-- >>> import Control.Lens
+-- >>> import qualified Data.Text as T
