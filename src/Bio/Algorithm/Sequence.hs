@@ -81,6 +81,9 @@ maxKmers = getMaxes . frequency
 -- This is done by scanning the entire genome with a window of size @l@. In each
 -- window, we get all @k@-mers, see if they exist @t@ times, and if they do, we
 -- add them to the result.
+--
+-- >>> "gatcagcataagggtccctgcaatgcatgacaagcctgcagttgttttac" ^. _RawSequence . to (ltClumps 4 25 3)
+-- [RawSequence "tgca"]
 ltClumps :: Int           -- ^ @k@. The length of the k-mers (i.e., the /k/ of the "k-mer")
          -> Int           -- ^ @l@. The interval size to scan
          -> Int           -- ^ @t@. How many times it must appear
