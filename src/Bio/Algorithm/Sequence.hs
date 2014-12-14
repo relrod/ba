@@ -21,6 +21,7 @@ module Bio.Algorithm.Sequence (
 
   -- * k-mer algorithms
 , kmers
+, maxKmers
 ) where
 
 import Bio.Algorithm.Types
@@ -39,14 +40,30 @@ import qualified Data.Map as Map
 -- | Find and list all of the kmers of the given length in the given string.
 --
 -- >>> kmers 3 (RawSequence $ BL.pack "AGATCGAGTG")
--- [RawSequence "AGA",RawSequence "AGT",RawSequence "ATC",RawSequence "CGA",RawSequence "GAG",RawSequence "GAT",RawSequence "GTG",RawSequence "TCG"]
+-- [RawSequence "AGA",RawSequence "GAT",RawSequence "ATC",RawSequence "TCG",RawSequence "CGA",RawSequence "GAG",RawSequence "AGT",RawSequence "GTG"]
 --
 -- >>> kmers 5 (RawSequence $ BL.pack "GTAGAGCTGT")
--- [RawSequence "AGAGC",RawSequence "AGCTG",RawSequence "GAGCT",RawSequence "GCTGT",RawSequence "GTAGA",RawSequence "TAGAG"]
+-- [RawSequence "GTAGA",RawSequence "TAGAG",RawSequence "AGAGC",RawSequence "GAGCT",RawSequence "AGCTG",RawSequence "GCTGT"]
+--
+-- >>> "gatatat" ^. _RawSequence . to (kmers 4)
+-- [RawSequence "gata",RawSequence "atat",RawSequence "tata",RawSequence "atat"]
 kmers :: Int           -- ^ The length of the k-mers (i.e., the /k/ of the "k-mer")
       -> RawSequence   -- ^ The sequence to search in
       -> [RawSequence] -- ^ The resulting list of k-mers
-kmers k (RawSequence s) = RawSequence <$> (getMaxes . frequency . kmers' k $ s)
+kmers k (RawSequence s) = RawSequence <$> kmers' k s
+  where
+    kmers' :: Int -> BL.ByteString -> [BL.ByteString]
+    kmers' _ "" = []
+    kmers' k' s' = if BL.length s' >= fromIntegral k'
+                   then BL.take (fromIntegral k') s' : kmers' k' (BL.drop 1 s')
+                   else kmers' k' (BL.drop 1 s')
+
+-- | Return only the kmers that appear the highest number of times.
+--
+-- >>> "gatatat" ^. _RawSequence . to (maxKmers . kmers 4)
+-- [RawSequence "atat"]
+maxKmers :: [RawSequence] -> [RawSequence]
+maxKmers = getMaxes . frequency
   where
     frequency :: Ord a => [a] -> Map.Map a Int
     frequency = Map.fromList . fmap (head &&& length) . group . sort
@@ -55,12 +72,6 @@ kmers k (RawSequence s) = RawSequence <$> (getMaxes . frequency . kmers' k $ s)
     getMaxes m = Map.keys (Map.filter (==f) m)
       where
         f = maximum . Map.elems $ m
-
-    kmers' :: Int -> BL.ByteString -> [BL.ByteString]
-    kmers' _ "" = []
-    kmers' k' s' = if BL.length s' >= fromIntegral k'
-                   then BL.take (fromIntegral k') s' : kmers' k' (BL.drop 1 s')
-                   else kmers' k' (BL.drop 1 s')
 
 -- | Return the reverse complement for some DNA sequence.
 --
