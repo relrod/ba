@@ -18,8 +18,12 @@ import Control.Lens
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Lazy.Encoding as TL
+import Data.String
 
 newtype RawSequence = RawSequence BL.ByteString deriving (Eq, Ord, Show)
+
+instance IsString RawSequence where
+  fromString = RawSequence . BL.pack
 
 instance Reversing RawSequence where
   reversing (RawSequence s) = RawSequence . reversing $ s
