@@ -24,9 +24,11 @@ newtype RawSequence = RawSequence BL.ByteString deriving (Eq, Ord, Show)
 
 instance IsString RawSequence where
   fromString = RawSequence . BL.pack
+  {-# INLINE fromString #-}
 
 instance Reversing RawSequence where
   reversing (RawSequence s) = RawSequence . reversing $ s
+  {-# INLINE reversing #-}
 
 class AsRawSequence p f s where
   _RawSequence :: Optic' p f s RawSequence
