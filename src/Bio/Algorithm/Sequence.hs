@@ -22,11 +22,13 @@ module Bio.Algorithm.Sequence (
   -- * k-mer algorithms
 , kmers
 , maxKmers
+, ltClumps
 ) where
 
 import Bio.Algorithm.Types
 import Control.Applicative
 import Control.Arrow
+import Control.Monad
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.List
 import qualified Data.Map as Map
@@ -72,6 +74,27 @@ maxKmers = getMaxes . frequency
     getMaxes m = Map.keys (Map.filter (==f) m)
       where
         f = maximum . Map.elems $ m
+
+-- | Find and list all distinct (L, t)-clumps of the given length in the given
+-- string.
+--
+-- This is done by scanning the entire genome with a window of size @l@. In each
+-- window, we get all @k@-mers, see if they exist @t@ times, and if they do, we
+-- add them to the result.
+ltClumps :: Int           -- ^ @k@. The length of the k-mers (i.e., the /k/ of the "k-mer")
+         -> Int           -- ^ @l@. The interval size to scan
+         -> Int           -- ^ @t@. How many times it must appear
+         -> RawSequence   -- ^ The sequence to search in
+         -> [RawSequence] -- ^ The resulting list of k-mers
+ltClumps k l t (RawSequence s) = nub . tTimes . map (kmers k . RawSequence) $ windows s
+  where
+    windows "" = []
+    windows s' = BL.take (fromIntegral l) s' : windows (BL.drop 1 s')
+
+    frequency :: Ord a => [a] -> [(a, Int)]
+    frequency = fmap (head &&& length) . group . sort
+
+    tTimes x = map fst . filter (\(_, y) -> y == t) . join . map frequency $ x
 
 -- | Return the reverse complement for some DNA sequence.
 --
