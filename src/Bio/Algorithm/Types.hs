@@ -32,6 +32,8 @@ import Bio.Algorithm.Types.DNA
 import Bio.Algorithm.Types.RawSequence
 import Bio.Algorithm.Types.RNA
 
+{-# ANN module "hlint: ignore Use import/export shortcut" #-}
+
 -- $setup
 -- >>> import Bio.Algorithm.Sequence
 -- >>> import Control.Lens
