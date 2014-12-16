@@ -82,6 +82,7 @@ rna :: Iso' RNA DNA
 rna = rnaDnaIso
 
 -- | Helper to make using 'rnaDnaIso' when converting from 'RNA' to 'DNA'.
+--
 -- >>> dna # RNA ("GAUGGAACUUGACUACGUAAAUU" ^. _RawSequence)
 -- DNA (RawSequence "GATGGAACTTGACTACGTAAATT")
 dna :: Iso' DNA RNA
