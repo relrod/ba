@@ -16,9 +16,6 @@ module Bio.Algorithm.Sequence (
   dnaReverseComplement
 , rnaReverseComplement
 
-  -- * Transcription
-, dnaToRna
-
   -- * k-mer algorithms
 , kmers
 , maxKmers
@@ -154,21 +151,3 @@ rnaReverseComplement (RNA (RawSequence s)) = RNA . RawSequence . BL.reverse . BL
     complement 'G' = 'C'
     complement 'g' = 'c'
     complement x   = x
-
--- | Transcribes a DNA sequence into RNA.
---
--- Transcribe a DNA sequence:
---
--- >>> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to (dnaToRna . DNA)
--- RNA (RawSequence "GAUGGAACUUGACUACGUAAAUU")
---
--- Transcribe and then take the 'rnaReverseComplement':
---
--- >>> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to (rnaReverseComplement . dnaToRna . DNA)
--- RNA (RawSequence "AAUUUACGUAGUCAAGUUCCAUC")
-dnaToRna :: DNA -> RNA
-dnaToRna (DNA (RawSequence s)) = RNA . RawSequence . BL.map rna $ s
-  where
-    rna 'T' = 'U'
-    rna 't' = 'u'
-    rna x   = x
