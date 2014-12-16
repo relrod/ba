@@ -58,7 +58,7 @@ instance AsRawSequence RNA where
 --
 -- Transcribe and then take the 'rnaReverseComplement':
 --
--- λ> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to DNA . from rnaDnaIso . to rnaReverseComplement
+-- >>> BL.pack "GATGGAACTTGACTACGTAAATT" ^. _RawSequence . to DNA . from rnaDnaIso . to rnaReverseComplement
 -- RNA (RawSequence "AAUUUACGUAGUCAAGUUCCAUC")
 rnaDnaIso :: Iso' RNA DNA
 rnaDnaIso = iso transcribeRnaToDna transcribeDnaToRna
