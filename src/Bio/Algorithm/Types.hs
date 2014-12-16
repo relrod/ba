@@ -23,14 +23,12 @@
 -- This module simply re-exports all of Bio.Algorithm.Types.*.
 ----------------------------------------------------------------------------
 module Bio.Algorithm.Types (
-  module Bio.Algorithm.Types.DNA
-, module Bio.Algorithm.Types.RawSequence
-, module Bio.Algorithm.Types.RNA
+  module Bio.Algorithm.Types.RawSequence
+, module Bio.Algorithm.Types.Sequence
 ) where
 
-import Bio.Algorithm.Types.DNA
 import Bio.Algorithm.Types.RawSequence
-import Bio.Algorithm.Types.RNA
+import Bio.Algorithm.Types.Sequence
 
 {-# ANN module "hlint: ignore Use import/export shortcut" #-}
 

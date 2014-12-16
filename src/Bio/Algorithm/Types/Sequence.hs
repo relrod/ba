@@ -3,7 +3,7 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module : Bio.Algorithm.Types.RNA
+-- Module : Bio.Algorithm.Types.Sequence
 -- Copyright : (C) 2014 Ricky Elrod
 -- License : BSD2 (see LICENSE file)
 -- Maintainer : Ricky Elrod <ricky@elrod.me>
@@ -12,11 +12,23 @@
 --
 -- RNA sequences
 ----------------------------------------------------------------------------
-module Bio.Algorithm.Types.RNA where
+module Bio.Algorithm.Types.Sequence where
 
 import Bio.Algorithm.Types.RawSequence
 import Control.Lens
 
+----------------------------------------------------------------------------
+-- DNA
+----------------------------------------------------------------------------
+newtype DNA = DNA RawSequence deriving (Eq, Ord, Show)
+
+instance AsRawSequence DNA where
+  _RawSequence = iso (\(DNA r) -> r) DNA
+  {-# INLINE _RawSequence #-}
+
+----------------------------------------------------------------------------
+-- RNA
+----------------------------------------------------------------------------
 newtype RNA = RNA RawSequence deriving (Eq, Ord, Show)
 
 instance AsRawSequence RNA where
