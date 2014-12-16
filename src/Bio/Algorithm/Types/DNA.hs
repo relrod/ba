@@ -19,6 +19,6 @@ import Control.Lens
 
 newtype DNA = DNA RawSequence deriving (Eq, Ord, Show)
 
-instance (Profunctor p, Functor f) => AsRawSequence p f DNA where
+instance AsRawSequence DNA where
   _RawSequence = iso (\(DNA r) -> r) DNA
   {-# INLINE _RawSequence #-}

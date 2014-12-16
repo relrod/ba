@@ -30,22 +30,22 @@ instance Reversing RawSequence where
   reversing (RawSequence s) = RawSequence . reversing $ s
   {-# INLINE reversing #-}
 
-class AsRawSequence p f s where
-  _RawSequence :: Optic' p f s RawSequence
+class AsRawSequence s where
+  _RawSequence :: Iso' s RawSequence
 
-instance AsRawSequence p f RawSequence where
+instance AsRawSequence RawSequence where
   _RawSequence = id
   {-# INLINE _RawSequence #-}
 
-instance (Profunctor p, Functor f) => AsRawSequence p f BL.ByteString where
+instance AsRawSequence BL.ByteString where
   _RawSequence = iso RawSequence (\(RawSequence r) -> r)
   {-# INLINE _RawSequence #-}
 
-instance (Profunctor p, Functor f) => AsRawSequence p f String where
+instance AsRawSequence String where
   _RawSequence = iso (RawSequence . BL.pack) (\(RawSequence r) -> BL.unpack r)
   {-# INLINE _RawSequence #-}
 
 -- | NOTE: This uses 'TL.decodeUtf8' and 'TL.encodeUtf8'.
-instance (Profunctor p, Functor f) => AsRawSequence p f TL.Text where
+instance AsRawSequence TL.Text where
   _RawSequence = iso (RawSequence . TL.encodeUtf8) (\(RawSequence r) -> TL.decodeUtf8 r)
   {-# INLINE _RawSequence #-}

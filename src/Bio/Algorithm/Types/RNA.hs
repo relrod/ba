@@ -19,6 +19,6 @@ import Control.Lens
 
 newtype RNA = RNA RawSequence deriving (Eq, Ord, Show)
 
-instance (Profunctor p, Functor f) => AsRawSequence p f RNA where
+instance AsRawSequence RNA where
   _RawSequence = iso (\(RNA r) -> r) RNA
   {-# INLINE _RawSequence #-}
