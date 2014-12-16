@@ -20,6 +20,9 @@ module Bio.Algorithm.Sequence (
 , kmers
 , maxKmers
 , ltClumps
+
+  -- * Skew
+, skews
 ) where
 
 import Bio.Algorithm.Types
@@ -151,3 +154,20 @@ rnaReverseComplement (RNA (RawSequence s)) = RNA . RawSequence . BL.reverse . BL
     complement 'G' = 'C'
     complement 'g' = 'c'
     complement x   = x
+
+-- | Find skews (difference in number of G and number of C occurances in some
+-- sequence) by removing a nucleotide from the right side and recursing over the
+-- remaining sequence.
+--
+-- Can be used to solve the Rosalind "Minimum Skew Problem" like this:
+--  @minSkewIndices s = map (+1) . findIndices (== minimum (skews s)) $ (skews s)@
+-- although it is too slow to actually be accepted.
+skews :: AsRawSequence s => s -> [Int]
+skews s = reverse . map fromIntegral $ runSkews (_RawSequence # (s ^. _RawSequence))
+  where
+    runSkews "" = []
+    runSkews s' =
+      let
+        numG = BL.length . BL.filter (liftM2 (||) (== 'G') (== 'g')) $ s'
+        numC = BL.length . BL.filter (liftM2 (||) (== 'C') (== 'c')) $ s'
+      in (numG - numC) : runSkews (BL.init s')
