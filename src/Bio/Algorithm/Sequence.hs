@@ -28,6 +28,7 @@ module Bio.Algorithm.Sequence (
 import Bio.Algorithm.Types
 import Control.Applicative
 import Control.Arrow
+import Control.Lens
 import Control.Monad
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.List
@@ -49,10 +50,17 @@ import qualified Data.Map as Map
 --
 -- >>> "gatatat" ^. _RawSequence . to (kmers 4)
 -- [RawSequence "gata",RawSequence "atat",RawSequence "tata",RawSequence "atat"]
-kmers :: Int           -- ^ The length of the k-mers (i.e., the /k/ of the "k-mer")
-      -> RawSequence   -- ^ The sequence to search in
-      -> [RawSequence] -- ^ The resulting list of k-mers
-kmers k (RawSequence s) = RawSequence <$> kmers' k s
+--
+-- >>> "gatatat" ^. _RawSequence . to DNA . to (kmers 4)
+-- [DNA (RawSequence "gata"),DNA (RawSequence "atat"),DNA (RawSequence "tata"),DNA (RawSequence "atat")]
+--
+-- >>> "gatatat" ^. _RawSequence . to RNA . to (kmers 4)
+-- [RNA (RawSequence "gata"),RNA (RawSequence "atat"),RNA (RawSequence "tata"),RNA (RawSequence "atat")]
+kmers :: AsRawSequence s
+      => Int -- ^ The length of the k-mers (i.e., the /k/ of the "k-mer")
+      -> s   -- ^ The sequence to search in
+      -> [s] -- ^ The resulting list of k-mers
+kmers k s = (_RawSequence #) . RawSequence <$> kmers' k (_RawSequence # (s ^. _RawSequence))
   where
     kmers' :: Int -> BL.ByteString -> [BL.ByteString]
     kmers' _ "" = []
@@ -64,8 +72,16 @@ kmers k (RawSequence s) = RawSequence <$> kmers' k s
 --
 -- >>> "gatatat" ^. _RawSequence . to (maxKmers . kmers 4)
 -- [RawSequence "atat"]
-maxKmers :: [RawSequence] -> [RawSequence]
-maxKmers = getMaxes . frequency
+--
+-- >>> "gatatat" ^. _RawSequence . to (maxKmers . kmers 4 . DNA)
+-- [DNA (RawSequence "atat")]
+--
+-- >>> "gatatat" ^. _RawSequence . to (maxKmers . kmers 4 . RNA)
+-- [RNA (RawSequence "atat")]
+maxKmers :: (AsRawSequence s, Ord s)
+         => [s]
+         -> [s]
+maxKmers s = getMaxes . frequency $ fmap ((_RawSequence #) . (^. _RawSequence)) s
   where
     frequency :: Ord a => [a] -> Map.Map a Int
     frequency = Map.fromList . fmap (head &&& length) . group . sort
