@@ -178,7 +178,7 @@ skews s = reverse . map fromIntegral $ runSkews (_RawSequence # (s ^. _RawSequen
 -- We define an approximate match as a match where the hamming distance is less
 -- than the given @d@.
 --
--- >>> approximateMatchIndices "CGCCCGAATCCAGAACGCATTCCCATATTTCGGGACCACTGGCCTCCACGGTACGGACGTCAATCAAATGCCTAGCGGCTTGTGGTTTCTCCTACGCTCC" "ATTCTGGA" 3
+-- >>> approximateMatchIndices (BL.pack "CGCCCGAATCCAGAACGCATTCCCATATTTCGGGACCACTGGCCTCCACGGTACGGACGTCAATCAAATGCCTAGCGGCTTGTGGTTTCTCCTACGCTCC") (BL.pack "ATTCTGGA") 3
 -- [6,7,26,27,78]
 approximateMatchIndices :: BL.ByteString -- ^ The string to search in.
                         -> BL.ByteString -- ^ The string to search for.
