@@ -20,6 +20,7 @@ module Bio.Algorithm.Sequence (
 , kmers
 , maxKmers
 , ltClumps
+, approximateMatches
 
   -- * Skew
 , skews
@@ -171,3 +172,21 @@ skews s = reverse . map fromIntegral $ runSkews (_RawSequence # (s ^. _RawSequen
         numG = BL.length . BL.filter (liftM2 (||) (== 'G') (== 'g')) $ s'
         numC = BL.length . BL.filter (liftM2 (||) (== 'C') (== 'c')) $ s'
       in (numG - numC) : runSkews (BL.init s')
+
+-- | Finds approximate matches for some given string, in a given string.
+--
+-- We define an approximate match as a match where the hamming distance is less
+-- than the given @d@.
+approximateMatches :: BL.ByteString -- ^ The string to search in.
+                   -> BL.ByteString -- ^ The string to search for.
+                   -> Int           -- ^ @d@. Max number of mutations.
+                   -> [Int]         -- ^ Indices of such matches.
+approximateMatches i pat d =
+  runApproximation $ filter ((BL.length pat ==) . BL.length) . windows $ i
+  where
+    hamming x y = length . filter (\(x', y') -> x' /= y') $ zip x y
+
+    windows "" = []
+    windows s' = BL.take (BL.length pat) s' : windows (BL.drop 1 s')
+
+    runApproximation = findIndices (\x -> hamming (BL.unpack x) (BL.unpack pat) <= d)
