@@ -14,9 +14,9 @@
 ----------------------------------------------------------------------------
 module Bio.Algorithm.Types.Protein where
 
-import Control.Lens
-import qualified Data.ByteString.Lazy.Char8 as BL
-import qualified Data.Text.Lazy as TL
-import qualified Data.Text.Lazy.Encoding as TL
+--import Control.Lens
+--import qualified Data.ByteString.Lazy.Char8 as BL
+--import qualified Data.Text.Lazy as TL
+--import qualified Data.Text.Lazy.Encoding as TL
 
 data Protein = Protein Char | Stop deriving (Eq, Ord, Show)
