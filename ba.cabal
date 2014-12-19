@@ -15,6 +15,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:     Bio.Algorithm.Sequence
                      , Bio.Algorithm.Types
+                     , Bio.Algorithm.Types.Protein
                      , Bio.Algorithm.Types.RawSequence
                      , Bio.Algorithm.Types.Sequence
   build-depends:       base >= 4 && < 5

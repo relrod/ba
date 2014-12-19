@@ -22,6 +22,9 @@ module Bio.Algorithm.Sequence (
 , ltClumps
 , approximateMatchIndices
 
+  -- * RNA -> Protein Translation
+, translate
+
   -- * Skew
 , skews
 ) where
@@ -193,3 +196,78 @@ approximateMatchIndices i pat d =
     windows s' = BL.take (BL.length pat) s' : windows (BL.drop 1 s')
 
     runApproximation = findIndices (\x -> hamming (BL.unpack x) (BL.unpack pat) <= d)
+
+-- | Translate t'RNA' to 'Protein'.
+--
+-- Returns 'Nothing' if given an invalid RNA sequence.
+-- Stops immediately and returns the result so far, upon encountering a stop
+-- codon ("UAA", "UAG", "UGA").
+--
+-- >>> translate (RNA ("AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGAAUG" ^. _RawSequence))
+-- Just [Protein 'M',Protein 'A',Protein 'M',Protein 'A',Protein 'P',Protein 'R',Protein 'T',Protein 'E',Protein 'I',Protein 'N',Protein 'S',Protein 'T',Protein 'R',Protein 'I',Protein 'N',Protein 'G']
+--
+-- >>> translate (RNA ("AUGGCfoobarfoobarCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGAAUG" ^. _RawSequence))
+-- Nothing
+--
+-- >>> translate (RNA ("GAAUAAfoobarfoobar" ^. _RawSequence))
+-- Just [Protein 'E']
+translate :: RNA -> Maybe [Protein]
+translate (RNA (RawSequence s)) = fmap (fmap Protein) (translate' s)
+  where
+    translate' "" = Just []
+    translate' b = do
+      p <- rnaToProtein (BL.take 3 b)
+      case p of
+       Stop -> return []
+       Protein protein -> do
+         x <- translate' (BL.drop 3 b)
+         return (protein : x)
+
+
+    rnaToProtein b = Map.lookup b proteinMap
+      where
+        a's   = ["GCU", "GCC", "GCA", "GCG"]
+        c's   = ["UGU", "UGC"]
+        d's   = ["GAU", "GAC"]
+        e's   = ["GAA", "GAG"]
+        f's   = ["UUU", "UUC"]
+        g's   = ["GGU", "GGC", "GGA", "GGG"]
+        h's   = ["CAU", "CAC"]
+        i's   = ["AUU", "AUC", "AUA"]
+        k's   = ["AAA", "AAG"]
+        l's   = ["UUA", "UUG", "CUU", "CUC", "CUA", "CUG"]
+        m's   = ["AUG"]
+        n's   = ["AAU", "AAC"]
+        p's   = ["CCU", "CCC", "CCA", "CCG"]
+        q's   = ["CAA", "CAG"]
+        r's   = ["CGU", "CGC", "CGA", "CGG", "AGA", "AGG"]
+        s's   = ["AGU", "AGC", "UCU", "UCC", "UCA", "UCG"]
+        t's   = ["ACU", "ACC", "ACA", "ACG"]
+        v's   = ["GUU", "GUC", "GUA", "GUG"]
+        w's   = ["UGG"]
+        y's   = ["UAU", "UAC"]
+        stops = ["UAA", "UAG", "UGA"]
+
+        proteinMap = Map.fromList $ join [
+            map (flip (,) (Protein 'A')) a's
+          , map (flip (,) (Protein 'C')) c's
+          , map (flip (,) (Protein 'D')) d's
+          , map (flip (,) (Protein 'E')) e's
+          , map (flip (,) (Protein 'F')) f's
+          , map (flip (,) (Protein 'G')) g's
+          , map (flip (,) (Protein 'H')) h's
+          , map (flip (,) (Protein 'I')) i's
+          , map (flip (,) (Protein 'K')) k's
+          , map (flip (,) (Protein 'L')) l's
+          , map (flip (,) (Protein 'M')) m's
+          , map (flip (,) (Protein 'N')) n's
+          , map (flip (,) (Protein 'P')) p's
+          , map (flip (,) (Protein 'Q')) q's
+          , map (flip (,) (Protein 'R')) r's
+          , map (flip (,) (Protein 'S')) s's
+          , map (flip (,) (Protein 'T')) t's
+          , map (flip (,) (Protein 'V')) v's
+          , map (flip (,) (Protein 'W')) w's
+          , map (flip (,) (Protein 'Y')) y's
+          , map (flip (,) Stop) stops
+          ]
