@@ -223,7 +223,6 @@ translate (RNA (RawSequence s)) = fmap (fmap Protein) (translate' s)
          x <- translate' (BL.drop 3 b)
          return (protein : x)
 
-
     rnaToProtein b = Map.lookup b proteinMap
       where
         a's   = ["GCU", "GCC", "GCA", "GCG"]
