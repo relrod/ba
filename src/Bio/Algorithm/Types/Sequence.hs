@@ -63,8 +63,8 @@ instance AsRawSequence RNA where
 rnaDnaIso :: Iso' RNA DNA
 rnaDnaIso = iso transcribeRnaToDna transcribeDnaToRna
   where
-    transcribeRnaToDna (RNA (RawSequence s)) = (BL.map rnaToDna s) ^. _RawSequence . to DNA
-    transcribeDnaToRna (DNA (RawSequence s)) = (BL.map dnaToRna s) ^. _RawSequence . to RNA
+    transcribeRnaToDna (RNA (RawSequence s)) = BL.map rnaToDna s ^. _RawSequence . to DNA
+    transcribeDnaToRna (DNA (RawSequence s)) = BL.map dnaToRna s ^. _RawSequence . to RNA
 
     rnaToDna 'U' = 'T'
     rnaToDna 'u' = 't'

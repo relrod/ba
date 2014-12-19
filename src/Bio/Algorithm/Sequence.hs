@@ -190,7 +190,7 @@ approximateMatchIndices :: BL.ByteString -- ^ The string to search in.
 approximateMatchIndices i pat d =
   runApproximation $ filter ((BL.length pat ==) . BL.length) . windows $ i
   where
-    hamming x y = length . filter (\(x', y') -> x' /= y') $ zip x y
+    hamming x y = length . filter (uncurry (/=)) $ zip x y
 
     windows "" = []
     windows s' = BL.take (BL.length pat) s' : windows (BL.drop 1 s')

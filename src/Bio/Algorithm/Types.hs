@@ -32,7 +32,7 @@ import Bio.Algorithm.Types.Protein
 import Bio.Algorithm.Types.RawSequence
 import Bio.Algorithm.Types.Sequence
 
---{-# ANN module "hlint: ignore Use import/export shortcut" #-}
+{-# ANN module "hlint: ignore Use import/export shortcut" #-}
 
 -- $setup
 -- >>> import Bio.Algorithm.Sequence
