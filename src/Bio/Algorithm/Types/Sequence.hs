@@ -42,7 +42,7 @@ instance AsRawSequence RNA where
 
 -- | Transcribes a DNA sequence into RNA.
 --
--- There exist (several, but one useful) isomorphism between 'DNA' and 'DNA' as
+-- There exist (several, but one useful) isomorphism between 'DNA' and 'RNA' as
 -- defined by David Spivak\'s
 -- <http://math.mit.edu/~dspivak/teaching/sp13/CT4S--static.pdf Category Theory for Scientists>.
 --
