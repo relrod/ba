@@ -1,40 +1,106 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE PatternSynonyms #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module : Bio.Algorithm.Types
--- Copyright : (C) 2014 Ricky Elrod
+-- Copyright : (C) 2017 Ricky Elrod
 -- License : BSD2 (see LICENSE file)
 -- Maintainer : Ricky Elrod <ricky@elrod.me>
 -- Stability : experimental
 -- Portability : lens
 --
--- An experimental approach to working with various bioinformatics types in
--- Haskell. Makes very heavy use of lens.
+-- We emphasize making illegal states unrepresentable. As such, creating
+-- something representing a particular kind of
+-- <http://rosalind.info/glossary/genetic-string/ genetic string> will be done
+-- by way of smart constructors. The default constructors will not be exported.
 --
--- Making such strong use of lenses, we enable an API that lets you do things
--- like this:
+-- We represent three different kinds of genetic strings (as per Rosalind),
+-- 'DNA', 'RNA', and 'Protein'.
 --
--- >>> T.pack "CCTTGGAA" ^. lazy . _RawSequence . to (dnaReverseComplement . DNA)
--- DNA (RawSequence "TTCCAAGG")
+-- A 'DNA' is created with 'mkDNA', an 'RNA' is created with 'mkRNA', and a
+-- 'Protein' is created with 'mkProtein'.
 --
--- Note that you can convert between lazy and strict versions of ByteString and
--- Text by using the appropriate
--- <https://hackage.haskell.org/package/lens/docs/Control-Lens-Iso.html#t:Strict lens combinators>.
---
--- This module simply re-exports all of Bio.Algorithm.Types.*.
+-- Because we don\'t export the constructors, pattern matching becomes
+-- impossible. To rectify this, we use PatternSynonyms and export patterns for
+-- each type. These are 'PDNA', 'PRNA', and 'PProtein', respectively.
+-- Internally, we represent sequences as lazy 'T.Text's, and this is what you
+-- deconstruct one using one of these pattern synonyms.
 ----------------------------------------------------------------------------
-module Bio.Algorithm.Types (
-  module Bio.Algorithm.Types.Protein
-, module Bio.Algorithm.Types.RawSequence
-, module Bio.Algorithm.Types.Sequence
-) where
 
-import Bio.Algorithm.Types.Protein
-import Bio.Algorithm.Types.RawSequence
-import Bio.Algorithm.Types.Sequence
+module Bio.Algorithm.Sequence where
 
-{-# ANN module "hlint: ignore Use import/export shortcut" #-}
+import Control.Lens
+import qualified Data.ByteString.Char8 as C8
+import qualified Data.ByteString.Lazy.Char8 as LC8
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as TE
+import qualified Data.Text.Lazy as TL
+import qualified Data.Text.Lazy.Encoding as TLE
 
--- $setup
--- >>> import Bio.Algorithm.Sequence
--- >>> import Control.Lens
--- >>> import qualified Data.Text as T
+-- | A 'DNA' sequence. This is constructed using the 'mkDNA' smart constructor
+-- below.
+newtype DNA = DNA TL.Text deriving (Eq, Ord, Show, Monoid)
+
+-- | An 'RNA' sequence. This is constructed using the 'mkRNA' smart constructor
+-- below.
+newtype RNA = RNA TL.Text deriving (Eq, Ord, Show, Monoid)
+
+-- | There a many different kinds of structures which can be converted into a
+-- 'DNA'. We specify these using 'Prism''s.
+class AsDNA a where
+  _DNA :: Prism' a DNA
+
+-- | Helper function for helping to validate a valid 'DNA' string.
+isDNAChar :: Char -> Bool
+isDNAChar 'A' = True
+isDNAChar 'C' = True
+isDNAChar 'G' = True
+isDNAChar 'T' = True
+isDNAChar _   = False
+
+stringDNA :: Prism' String DNA
+stringDNA = prism' (\(DNA tl) -> TL.unpack tl) toDNA
+  where
+    toDNA s =
+      if length (filter isDNAChar s) == length s
+      then Just (DNA (TL.pack s))
+      else Nothing
+
+instance AsDNA String where
+  _DNA = stringDNA
+
+lazyTextDNA :: Prism' TL.Text DNA
+lazyTextDNA = prism' (\(DNA tl) -> tl) toDNA
+  where
+    toDNA s =
+      if TL.length (TL.filter isDNAChar s) == TL.length s
+      then Just (DNA s)
+      else Nothing
+
+instance AsDNA TL.Text where
+  _DNA = lazyTextDNA
+
+strictTextDNA :: Prism' T.Text DNA
+strictTextDNA = prism' (\(DNA t) -> TL.toStrict t) (\t -> t ^? lazy . _DNA)
+
+instance AsDNA T.Text where
+  _DNA = strictTextDNA
+
+lazyBSDNA :: Prism' LC8.ByteString DNA
+lazyBSDNA = prism' (\(DNA tl) -> TLE.encodeUtf8 tl) toDNA
+  where
+    toDNA s =
+      if LC8.length (LC8.filter isDNAChar s) == LC8.length s
+      then Just (DNA (TLE.decodeUtf8 s))
+      else Nothing
+
+instance AsDNA LC8.ByteString where
+  _DNA = lazyBSDNA
+
+strictBSDNA :: Prism' C8.ByteString DNA
+strictBSDNA =
+  prism' (\(DNA t) -> t ^. strict . to TE.encodeUtf8) (\t -> t ^? lazy . _DNA)
+
+instance AsDNA C8.ByteString where
+  _DNA = strictBSDNA
