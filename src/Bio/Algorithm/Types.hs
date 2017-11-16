@@ -94,6 +94,14 @@ isDNAChar 'G' = True
 isDNAChar 'T' = True
 isDNAChar _   = False
 
+-- | DNA is, of course, isomorphic to itself under the identity function.
+dnaIso :: Iso' DNA DNA
+dnaIso = iso id id
+
+-- | Free since every 'Iso' is a 'Prism'.
+instance AsDNA DNA where
+  _DNA = dnaIso
+
 stringDNA :: Prism' String DNA
 stringDNA = prism' (\(DNA tl) -> TL.unpack tl) toDNA
   where
@@ -152,6 +160,14 @@ isRNAChar 'C' = True
 isRNAChar 'G' = True
 isRNAChar 'U' = True
 isRNAChar _   = False
+
+-- | RNA is, of course, isomorphic to itself under the identity function.
+rnaIso :: Iso' RNA RNA
+rnaIso = iso id id
+
+-- | Free since every 'Iso' is a 'Prism'.
+instance AsRNA RNA where
+  _RNA = rnaIso
 
 stringRNA :: Prism' String RNA
 stringRNA = prism' (\(RNA tl) -> TL.unpack tl) toRNA
