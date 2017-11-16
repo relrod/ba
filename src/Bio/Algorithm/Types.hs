@@ -117,3 +117,62 @@ strictBSDNA =
 
 instance AsDNA C8.ByteString where
   _DNA = strictBSDNA
+
+-- | There a many different kinds of structures which can be converted into a
+-- 'RNA'. We specify these using 'Prism''s.
+class AsRNA a where
+  _RNA :: Prism' a RNA
+
+-- | Helper function for helping to validate a valid 'RNA' string.
+isRNAChar :: Char -> Bool
+isRNAChar 'A' = True
+isRNAChar 'C' = True
+isRNAChar 'G' = True
+isRNAChar 'U' = True
+isRNAChar _   = False
+
+stringRNA :: Prism' String RNA
+stringRNA = prism' (\(RNA tl) -> TL.unpack tl) toRNA
+  where
+    toRNA s =
+      if length (filter isRNAChar s) == length s
+      then Just (RNA (TL.pack s))
+      else Nothing
+
+instance AsRNA String where
+  _RNA = stringRNA
+
+lazyTextRNA :: Prism' TL.Text RNA
+lazyTextRNA = prism' (\(RNA tl) -> tl) toRNA
+  where
+    toRNA s =
+      if TL.length (TL.filter isRNAChar s) == TL.length s
+      then Just (RNA s)
+      else Nothing
+
+instance AsRNA TL.Text where
+  _RNA = lazyTextRNA
+
+strictTextRNA :: Prism' T.Text RNA
+strictTextRNA = prism' (\(RNA t) -> TL.toStrict t) (\t -> t ^? lazy . _RNA)
+
+instance AsRNA T.Text where
+  _RNA = strictTextRNA
+
+lazyBSRNA :: Prism' LC8.ByteString RNA
+lazyBSRNA = prism' (\(RNA tl) -> TLE.encodeUtf8 tl) toRNA
+  where
+    toRNA s =
+      if LC8.length (LC8.filter isRNAChar s) == LC8.length s
+      then Just (RNA (TLE.decodeUtf8 s))
+      else Nothing
+
+instance AsRNA LC8.ByteString where
+  _RNA = lazyBSRNA
+
+strictBSRNA :: Prism' C8.ByteString RNA
+strictBSRNA =
+  prism' (\(RNA t) -> t ^. strict . to TE.encodeUtf8) (\t -> t ^? lazy . _RNA)
+
+instance AsRNA C8.ByteString where
+  _RNA = strictBSRNA
