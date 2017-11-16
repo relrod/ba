@@ -28,7 +28,20 @@
 -- deconstruct one using one of these pattern synonyms.
 ----------------------------------------------------------------------------
 
-module Bio.Algorithm.Sequence where
+module Bio.Algorithm.Types
+  (
+  -- * Macromolecule types
+    DNA
+  , RNA
+  -- * Prisms
+  , stringDNA
+  , lazyTextDNA
+  , strictTextDNA
+  , lazyBSDNA
+  , strictBSDNA
+  -- * Helper Functions
+  , isDNAChar
+  ) where
 
 import Control.Lens
 import qualified Data.ByteString.Char8 as C8
