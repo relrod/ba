@@ -33,14 +33,26 @@ module Bio.Algorithm.Types
   -- * Macromolecule types
     DNA
   , RNA
-  -- * Prisms
+  -- * Prisms (DNA)
   , stringDNA
   , lazyTextDNA
   , strictTextDNA
   , lazyBSDNA
   , strictBSDNA
+  -- * Prisms (RNA)
+  , stringRNA
+  , lazyTextRNA
+  , strictTextRNA
+  , lazyBSRNA
+  , strictBSRNA
+  -- * Transcription isomorphism
+  , transcribe
+  , reverseTranscribe
   -- * Helper Functions
+  , mapDNA
+  , mapRNA
   , isDNAChar
+  , isRNAChar
   ) where
 
 import Control.Lens
@@ -63,6 +75,16 @@ newtype RNA = RNA TL.Text deriving (Eq, Ord, Show, Monoid)
 -- 'DNA'. We specify these using 'Prism''s.
 class AsDNA a where
   _DNA :: Prism' a DNA
+
+-- | Map over a 'DNA' sequence if possible. In general, prefer to use more
+-- \"Lensy\" ways of doing this.
+mapDNA :: (AsDNA s, AsDNA t) => (s -> t) -> DNA -> Maybe DNA
+mapDNA f dna = f (dna ^. re _DNA) ^? _DNA
+
+-- | Map over an 'RNA' sequence if possible. In general, prefer to use more
+-- \"Lensy\" ways of doing this.
+mapRNA :: (AsRNA s, AsRNA t) => (s -> t) -> RNA -> Maybe RNA
+mapRNA f rna = f (rna ^. re _RNA) ^? _RNA
 
 -- | Helper function for helping to validate a valid 'DNA' string.
 isDNAChar :: Char -> Bool
@@ -176,3 +198,27 @@ strictBSRNA =
 
 instance AsRNA C8.ByteString where
   _RNA = strictBSRNA
+
+-- | There is an isomorphism between 'DNA' and 'RNA' defined by 'RNA'
+-- transcription and reverse-transcription.
+transcribe :: Iso' DNA RNA
+transcribe = iso toRNA fromRNA
+  where
+    comp 'A' = 'U'
+    comp 'C' = 'G'
+    comp 'G' = 'C'
+    comp 'T' = 'A'
+    comp x = x -- should never happen
+    revComp 'U' = 'A'
+    revComp 'G' = 'C'
+    revComp 'C' = 'G'
+    revComp 'A' = 'T'
+    revComp x = x -- should never happen
+    toRNA (DNA dna) = RNA (TL.map comp dna)
+    fromRNA (RNA rna) = DNA (TL.map revComp rna)
+
+-- | A helper to reverse-transcribe back to 'DNA'.
+--
+-- @reverseTranscribe = from transcribe@
+reverseTranscribe :: Iso' RNA DNA
+reverseTranscribe = from transcribe
