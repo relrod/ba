@@ -80,12 +80,12 @@ class AsDNA a where
 -- | Map over a 'DNA' sequence if possible. In general, prefer to use more
 -- \"Lensy\" ways of doing this.
 mapDNA :: (AsDNA s, AsDNA t) => (s -> t) -> DNA -> Maybe DNA
-mapDNA f dna = f (dna ^. re _DNA) ^? _DNA
+mapDNA f dna = dna ^. re _DNA . to f ^? _DNA
 
 -- | Map over an 'RNA' sequence if possible. In general, prefer to use more
 -- \"Lensy\" ways of doing this.
 mapRNA :: (AsRNA s, AsRNA t) => (s -> t) -> RNA -> Maybe RNA
-mapRNA f rna = f (rna ^. re _RNA) ^? _RNA
+mapRNA f rna = rna ^. re _RNA . to f ^? _RNA
 
 -- | Helper function for helping to validate a valid 'DNA' string.
 isDNAChar :: Char -> Bool
