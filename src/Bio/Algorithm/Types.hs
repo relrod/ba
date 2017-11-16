@@ -58,6 +58,7 @@ module Bio.Algorithm.Types
 import Control.Lens
 import qualified Data.ByteString.Char8 as C8
 import qualified Data.ByteString.Lazy.Char8 as LC8
+import Data.Semigroup
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Lazy as TL
@@ -65,11 +66,11 @@ import qualified Data.Text.Lazy.Encoding as TLE
 
 -- | A 'DNA' sequence. This is constructed using the 'mkDNA' smart constructor
 -- below.
-newtype DNA = DNA TL.Text deriving (Eq, Ord, Show, Monoid)
+newtype DNA = DNA TL.Text deriving (Eq, Ord, Show, Monoid, Semigroup)
 
 -- | An 'RNA' sequence. This is constructed using the 'mkRNA' smart constructor
 -- below.
-newtype RNA = RNA TL.Text deriving (Eq, Ord, Show, Monoid)
+newtype RNA = RNA TL.Text deriving (Eq, Ord, Show, Monoid, Semigroup)
 
 -- | There a many different kinds of structures which can be converted into a
 -- 'DNA'. We specify these using 'Prism''s.
