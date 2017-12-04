@@ -48,6 +48,9 @@ module Bio.Algorithm.Types
   -- * Transcription isomorphism
   , transcribe
   , reverseTranscribe
+  -- * Trivial isomorphisms
+  , dnaIso
+  , rnaIso
   -- * Helper Functions
   , mapDNA
   , mapRNA
