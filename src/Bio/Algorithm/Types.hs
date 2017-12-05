@@ -33,6 +33,9 @@ module Bio.Algorithm.Types
   -- * Macromolecule types
     DNA
   , RNA
+  -- * Patterns
+  , pattern PDNA
+  , pattern PRNA
   -- * Prisms (DNA)
   , stringDNA
   , lazyTextDNA
@@ -70,6 +73,17 @@ import qualified Data.Text.Lazy.Encoding as TLE
 -- | A 'DNA' sequence. This is constructed using the 'mkDNA' smart constructor
 -- below.
 newtype DNA = DNA TL.Text deriving (Eq, Ord, Show, Monoid, Semigroup)
+
+-- | Since raw constructors are not exported, we provide these a pattern for
+-- deconstructing 'DNA' and 'RNA'. This is one such pattern for 'DNA'. Generally
+-- it should not be needed (use the lens combinators instead), but we provide it
+-- here anyway, and use it internally in some places.
+pattern PDNA :: TL.Text -> DNA
+pattern PDNA a <- DNA a
+
+-- | And this is the same for 'RNA'.
+pattern PRNA :: TL.Text -> RNA
+pattern PRNA a <- RNA a
 
 -- | An 'RNA' sequence. This is constructed using the 'mkRNA' smart constructor
 -- below.
